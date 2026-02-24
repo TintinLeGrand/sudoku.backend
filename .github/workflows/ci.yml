@@ -1,0 +1,49 @@
+name: CI
+on:
+  push:
+    branches: [ main, dev ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    name: Lint, Test & Version Check
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout du code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Installer Bun
+        uses: oven-sh/setup-bun@v1
+        with:
+          bun-version: latest
+
+      - name: Installer les dépendances
+        run: bun install
+
+      - name: Vérifier le formatage et le lint (Biome)
+        run: bunx @biomejs/biome ci .
+
+      - name: Lancer les tests
+        run: bun test
+
+      - name: Vérifier l'incrémentation de la version
+        if: github.event_name == 'pull_request' && github.base_ref == 'main'
+        run: |
+          # Récupérer la version sur la branche cible (main)
+          VERSION_MAIN=$(git show origin/main:package.json | jq -r .version)
+          # Récupérer la version actuelle sur la branche de la PR
+          VERSION_CURRENT=$(jq -r .version package.json)
+
+          echo "Version sur main: $VERSION_MAIN"
+          echo "Version actuelle: $VERSION_CURRENT"
+
+          if [ "$VERSION_MAIN" == "$VERSION_CURRENT" ]; then
+            echo "Erreur : La version dans package.json doit être augmentée avant de merger sur main."
+            exit 1
+          else
+            echo "Version mise à jour avec succès."
+          fi
