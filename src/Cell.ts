@@ -30,7 +30,7 @@ export class Cell {
 		return false;
 	}
 
-	public erase(category: CellCategory): boolean {
+	public erase(number: number, category: CellCategory): boolean {
 		return false;
 	}
 

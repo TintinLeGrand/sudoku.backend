@@ -72,13 +72,66 @@ describe("Cell tests", () => {
 		expect(cell.final).toBeFalse();
 	});
 
-	it("Should erase a draft", () => {});
+	it("Should erase a draft", () => {
+		const cell = new Cell();
+		expect(cell.put(1, CellCategory.Draft)).toBeTrue();
+		expect(cell.drafts).toContainValue(1);
+		expect(cell.put(2, CellCategory.Draft)).toBeTrue();
+		expect(cell.drafts).toContainValue(2);
+		expect(cell.erase(1, CellCategory.Draft)).toBeTrue();
+		expect(cell.drafts).toBeArrayOfSize(1);
+		expect(cell.erase(2, CellCategory.Draft)).toBeTrue();
+		expect(cell.drafts).toBeArrayOfSize(0);
+		expect(cell.erase(1, CellCategory.Draft)).toBeFalse();
+	});
 
-	it("Should not erase a draft if cell is final", () => {});
+	it("Should not erase a draft if cell is final", () => {
+		const cell = new Cell();
+		expect(cell.put(1, CellCategory.Draft)).toBeTrue();
+		expect(cell.put(2, CellCategory.Normal)).toBeTrue();
+		expect(cell.finalize()).toBeTrue();
+		expect(cell.final).toBeTrue();
+		expect(cell.erase(1, CellCategory.Draft)).toBeFalse();
+	});
 
-	it("Should erase a number", () => {});
+	it("Should not erase an illegal draft", () => {
+		const cell = new Cell();
+		expect(cell.erase(0, CellCategory.Draft)).toBeFalse();
+		expect(cell.erase(10, CellCategory.Draft)).toBeFalse();
+		expect(cell.erase(1, CellCategory.Draft)).toBeFalse();
+		expect(cell.erase(Number.MIN_SAFE_INTEGER, CellCategory.Draft)).toBeFalse();
+		expect(cell.erase(Number.MAX_SAFE_INTEGER, CellCategory.Draft)).toBeFalse();
+	});
 
-	it("Should not erase a number if cell is final", () => {});
+	it("Should erase a number", () => {
+		const cell = new Cell();
+		expect(cell.put(1, CellCategory.Normal)).toBeTrue();
+		expect(cell.number).toBe(1);
+		expect(cell.erase(1, CellCategory.Normal)).toBeTrue();
+		expect(cell.number).toBeNull();
+		expect(cell.erase(1, CellCategory.Normal)).toBeFalse();
+	});
+
+	it("Should not erase a number if cell is final", () => {
+		const cell = new Cell();
+		expect(cell.put(1, CellCategory.Normal)).toBeTrue();
+		expect(cell.finalize()).toBeTrue();
+		expect(cell.erase(1, CellCategory.Normal)).toBeFalse();
+		expect(cell.number).toBe(1);
+	});
+
+	it("Should not erase an illegal number", () => {
+		const cell = new Cell();
+		expect(cell.erase(0, CellCategory.Normal)).toBeFalse();
+		expect(cell.erase(10, CellCategory.Normal)).toBeFalse();
+		expect(cell.erase(1, CellCategory.Normal)).toBeFalse();
+		expect(
+			cell.erase(Number.MIN_SAFE_INTEGER, CellCategory.Normal),
+		).toBeFalse();
+		expect(
+			cell.erase(Number.MAX_SAFE_INTEGER, CellCategory.Normal),
+		).toBeFalse();
+	});
 });
 
 describe("grid tests", () => {});
