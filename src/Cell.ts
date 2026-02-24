@@ -1,19 +1,17 @@
-export enum CellType {
-	Empty = "empty",
-	Final = "final",
+export enum CellCategory {
+	Normal = "normal",
 	Draft = "draft",
-	Written = "written",
 }
 
 export class Cell {
 	private _number: number | null;
 	private _drafts: number[];
-	private _type: CellType;
+	private _final: boolean;
 
 	constructor() {
 		this._number = null;
 		this._drafts = [];
-		this._type = CellType.Empty;
+		this._final = false;
 	}
 
 	get number(): number | null {
@@ -24,20 +22,20 @@ export class Cell {
 		return this._drafts;
 	}
 
-	get type(): CellType {
-		return this._type;
+	get final(): boolean {
+		return this._final;
 	}
 
-	public put(number: number, as: CellType.Draft | CellType.Written): boolean {
+	public put(number: number, category: CellCategory): boolean {
 		return false;
 	}
 
-	public erase(): boolean {
+	public erase(category: CellCategory): boolean {
 		return false;
 	}
 
 	public finalize(): boolean {
-		this._type = CellType.Final;
+		this._final = true;
 		return false;
 	}
 }
