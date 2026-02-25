@@ -31,8 +31,11 @@ jobs:
 
       - name: Publish Package
         run: |
-          cat << EOF > .npmrc
-          @${{ github.repository_owner }}:registry=https://npm.pkg.github.com
+          echo "//npm.pkg.github.com/:_authToken=${{ secrets.GITHUB_TOKEN }}" >> .npmrc
+          
+          echo "Publication de la version : $(jq -r .version package.json)"
+          
+          bun publish --ignore-scripts
           //npm.pkg.github.com/:_authToken=${{ secrets.GITHUB_TOKEN }}
           EOF
           bun publish --ignore-scripts
