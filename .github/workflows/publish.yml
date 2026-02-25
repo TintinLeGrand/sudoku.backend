@@ -2,27 +2,20 @@ name: Publish Package
 
 on:
   push:
-    branches:
-      - main
+    branches: [ main ]
 
 jobs:
   publish:
-    name: Build & Publish Release
+    name: Build & Publish
     runs-on: ubuntu-latest
     permissions:
       contents: read
       packages: write
     
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
+      - uses: actions/checkout@v4
 
-      - name: Setup Bun
-        uses: oven-sh/setup-bun@v1
-        with:
-          bun-version: latest
+      - uses: oven-sh/setup-bun@v1
 
       - name: Install Dependencies
         run: bun install --frozen-lockfile
@@ -35,4 +28,4 @@ jobs:
       - name: Publish Package
         run: |
           echo "//npm.pkg.github.com/:_authToken=${{ secrets.GITHUB_TOKEN }}" >> .npmrc
-          bun publish
+          bun publish --ignore-scripts
