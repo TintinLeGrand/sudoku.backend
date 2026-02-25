@@ -1,9 +1,12 @@
 {
-	"name": "sudoku.backend",
-	"version": "1.0.0",
-	"module": "index.ts",
+	"name": "@tintinlegrand/sudoku.backend",
+	"version": "0.1.0",
+	"main": "dist/index.js",
+	"types": "dist/index.d.ts",
 	"type": "module",
-	"private": true,
+	"publishConfig": {
+		"registry": "https://npm.pkg.github.com"
+	},
 	"devDependencies": {
 		"@biomejs/biome": "2.4.4",
 		"@types/bun": "latest",
@@ -14,6 +17,7 @@
 		"typescript": "^5"
 	},
 	"scripts": {
+		"build": "tsc",
 		"prepare": "husky"
 	},
 	"lint-staged": {
