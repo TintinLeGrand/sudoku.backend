@@ -23,15 +23,16 @@ jobs:
         uses: oven-sh/setup-bun@v1
         with:
           bun-version: latest
-          registry-url: 'https://npm.pkg.github.com'
 
       - name: Install Dependencies
         run: bun install --frozen-lockfile
+        env:
+          HUSKY: 0
 
       - name: Build Package
         run: bun run build
 
       - name: Publish Package
-        run: bun publish
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "//npm.pkg.github.com/:_authToken=${{ secrets.GITHUB_TOKEN }}" >> .npmrc
+          bun publish
