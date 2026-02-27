@@ -53,15 +53,15 @@ describe("Grid tests", () => {
 		const row = grid.getRow(0);
 
 		expect(row).toBeArrayOfSize(9);
-		expect(row[0]!.number).toBe(1);
-		expect(row[1]!.number).toBe(2);
-		expect(row[2]!.number).toBe(3);
-		expect(row[3]!.number).toBe(4);
-		expect(row[4]!.number).toBe(5);
-		expect(row[5]!.number).toBe(6);
-		expect(row[6]!.number).toBe(7);
-		expect(row[7]!.number).toBe(8);
-		expect(row[8]!.number).toBe(9);
+		expect(row[0]?.number).toBe(1);
+		expect(row[1]?.number).toBe(2);
+		expect(row[2]?.number).toBe(3);
+		expect(row[3]?.number).toBe(4);
+		expect(row[4]?.number).toBe(5);
+		expect(row[5]?.number).toBe(6);
+		expect(row[6]?.number).toBe(7);
+		expect(row[7]?.number).toBe(8);
+		expect(row[8]?.number).toBe(9);
 	});
 
 	it("Should throw on invalid row index", () => {
@@ -76,9 +76,9 @@ describe("Grid tests", () => {
 		grid.put(0, 1, 2);
 		const col = grid.getColumn(0);
 		expect(col).toBeArrayOfSize(9);
-		expect(col[0]!.number).toBe(1);
-		expect(col[1]!.number).toBe(2);
-		expect(col[2]!.number).toBeNull();
+		expect(col[0]?.number).toBe(1);
+		expect(col[1]?.number).toBe(2);
+		expect(col[2]?.number).toBeNull();
 	});
 
 	it("Should throw invalid column index", () => {
