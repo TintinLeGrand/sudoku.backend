@@ -133,5 +133,3 @@ describe("Cell tests", () => {
 		).toBeFalse();
 	});
 });
-
-describe("grid tests", () => {});
