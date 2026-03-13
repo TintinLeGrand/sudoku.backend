@@ -1,2 +1,2 @@
-export { Cell } from "./Cell";
+export { Cell, CellCategory } from "./Cell";
 export { Grid } from "./Grid";
