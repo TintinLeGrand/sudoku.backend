@@ -26,6 +26,13 @@ describe("Grid tests", () => {
 		expect(grid.cells).toBeArrayOfSize(size * size);
 	});
 
+	it("Should allow values up to the grid size", () => {
+		const grid = new Grid(16);
+		expect(grid.put(15, 15, 16)).toBeTrue();
+		expect(grid.getCell(15, 15).number).toBe(16);
+		expect(grid.put(0, 0, 17)).toBeFalse();
+	});
+
 	it("Should not create a grid", () => {
 		expect(() => new Grid(10)).toThrow("Invalid grid size");
 		expect(() => new Grid(5)).toThrow("Invalid grid size");
