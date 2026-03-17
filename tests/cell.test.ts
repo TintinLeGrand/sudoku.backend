@@ -29,9 +29,16 @@ describe("Cell tests", () => {
 	it("Should not set an illegal number in a Cell", () => {
 		const cell = new Cell();
 		expect(cell.put(0, CellCategory.Normal)).toBeFalse();
-		expect(cell.put(10, CellCategory.Normal)).toBeFalse();
-		expect(cell.put(Number.MIN_SAFE_INTEGER, CellCategory.Normal)).toBeFalse();
-		expect(cell.put(Number.MAX_SAFE_INTEGER, CellCategory.Normal)).toBeFalse();
+		expect(cell.put(-1, CellCategory.Normal)).toBeFalse();
+		expect(cell.put(1.5, CellCategory.Normal)).toBeFalse();
+		expect(cell.put(Number.NaN, CellCategory.Normal)).toBeFalse();
+		expect(cell.put(Number.POSITIVE_INFINITY, CellCategory.Normal)).toBeFalse();
+	});
+
+	it("Should allow positive integers above 9 in a Cell", () => {
+		const cell = new Cell();
+		expect(cell.put(10, CellCategory.Normal)).toBeTrue();
+		expect(cell.number).toBe(10);
 	});
 
 	it("Should add numbers to drafts", () => {
@@ -50,9 +57,10 @@ describe("Cell tests", () => {
 	it("Should not add illegal numbers to drafts", () => {
 		const cell = new Cell();
 		expect(cell.put(0, CellCategory.Draft)).toBeFalse();
-		expect(cell.put(10, CellCategory.Draft)).toBeFalse();
-		expect(cell.put(Number.MIN_SAFE_INTEGER, CellCategory.Draft)).toBeFalse();
-		expect(cell.put(Number.MAX_SAFE_INTEGER, CellCategory.Draft)).toBeFalse();
+		expect(cell.put(-1, CellCategory.Draft)).toBeFalse();
+		expect(cell.put(1.5, CellCategory.Draft)).toBeFalse();
+		expect(cell.put(Number.NaN, CellCategory.Draft)).toBeFalse();
+		expect(cell.put(Number.POSITIVE_INFINITY, CellCategory.Draft)).toBeFalse();
 	});
 
 	it("Should set to final a Cell", () => {
@@ -97,10 +105,13 @@ describe("Cell tests", () => {
 	it("Should not erase an illegal draft", () => {
 		const cell = new Cell();
 		expect(cell.erase(0, CellCategory.Draft)).toBeFalse();
-		expect(cell.erase(10, CellCategory.Draft)).toBeFalse();
+		expect(cell.erase(-1, CellCategory.Draft)).toBeFalse();
 		expect(cell.erase(1, CellCategory.Draft)).toBeFalse();
-		expect(cell.erase(Number.MIN_SAFE_INTEGER, CellCategory.Draft)).toBeFalse();
-		expect(cell.erase(Number.MAX_SAFE_INTEGER, CellCategory.Draft)).toBeFalse();
+		expect(cell.erase(1.5, CellCategory.Draft)).toBeFalse();
+		expect(cell.erase(Number.NaN, CellCategory.Draft)).toBeFalse();
+		expect(
+			cell.erase(Number.POSITIVE_INFINITY, CellCategory.Draft),
+		).toBeFalse();
 	});
 
 	it("Should erase a number", () => {
@@ -123,13 +134,12 @@ describe("Cell tests", () => {
 	it("Should not erase an illegal number", () => {
 		const cell = new Cell();
 		expect(cell.erase(0, CellCategory.Normal)).toBeFalse();
-		expect(cell.erase(10, CellCategory.Normal)).toBeFalse();
+		expect(cell.erase(-1, CellCategory.Normal)).toBeFalse();
 		expect(cell.erase(1, CellCategory.Normal)).toBeFalse();
+		expect(cell.erase(1.5, CellCategory.Normal)).toBeFalse();
+		expect(cell.erase(Number.NaN, CellCategory.Normal)).toBeFalse();
 		expect(
-			cell.erase(Number.MIN_SAFE_INTEGER, CellCategory.Normal),
-		).toBeFalse();
-		expect(
-			cell.erase(Number.MAX_SAFE_INTEGER, CellCategory.Normal),
+			cell.erase(Number.POSITIVE_INFINITY, CellCategory.Normal),
 		).toBeFalse();
 	});
 });
