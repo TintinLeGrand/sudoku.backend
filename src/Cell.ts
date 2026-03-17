@@ -72,5 +72,5 @@ export class Cell {
 }
 
 function isIllegalNumber(number: number) {
-	return number < 1 || number > 9 || !Number.isInteger(number);
+	return number < 1 || !Number.isInteger(number);
 }
