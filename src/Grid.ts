@@ -99,4 +99,48 @@ export class Grid {
 			}
 		}
 	}
+
+	public putLine(line: number, cells: Cell[]) {
+		for (let i = 0; i < this.size; i++) {
+			this.put(i, line, cells[i]!.number!, CellCategory.Normal);
+		}
+	}
+
+	public putColumn(column: number, cells: Cell[]) {
+		for (let i = 0; i < this.size; i++) {
+			this.put(column, i, cells[i]!.number!, CellCategory.Normal);
+		}
+	}
+
+	public putBlock(block: number, cells: Cell[]) {
+		const blockSize = Math.sqrt(this.size);
+		const blockX = Math.floor(block / blockSize);
+		const blockY = block % blockSize;
+
+		const startX = blockX * blockSize;
+		const startY = blockY * blockSize;
+		for (let i = 0; i < this.size; i++) {
+			this.put(
+				startX + (i % blockSize),
+				startY + Math.floor(i / blockSize),
+				cells[i]!.number!,
+				CellCategory.Normal,
+			);
+		}
+	}
+
+	public displayGrid() {
+		const grid: string[][] = [];
+
+		for (let y = 0; y < this.size; y++) {
+			const row: string[] = [];
+			for (let x = 0; x < this.size; x++) {
+				const value = this.getCell(x, y).number ?? "x";
+				row.push(value === null ? "." : value.toString());
+			}
+			grid.push(row);
+		}
+
+		console.table(grid);
+	}
 }
