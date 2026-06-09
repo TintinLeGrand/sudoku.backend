@@ -65,4 +65,56 @@ function generateGrid(grid: Grid, difficulty: Difficulty) {
 	grid.displayGrid();
 }
 
+function backtrack(grid: Grid): boolean {
+	const tab = grid.convertToTab();
+	return backtrackTab(tab);
+}
+
+function backtrackTab(tab: number[][]): boolean {
+	const size = tab.length;
+
+	for (let y = 0; y < size; y++) {
+		for (let x = 0; x < size; x++) {
+			if (tab[y]![x] !== 0) continue;
+
+			for (let num = 1; num <= size; num++) {
+				if (isValid(tab, y, x, num)) {
+					tab[y]![x] = num;
+					if (backtrackTab(tab)) return true;
+					tab[y]![x] = 0;
+				}
+			}
+
+			return false;
+		}
+	}
+
+	return true;
+}
+
+function isValid(
+	tab: number[][],
+	row: number,
+	col: number,
+	num: number,
+): boolean {
+	const size = tab.length;
+	const blockSize = Math.sqrt(size);
+
+	for (let i = 0; i < size; i++) {
+		if (tab[row]![i] === num) return false;
+		if (tab[i]![col] === num) return false;
+	}
+
+	const startRow = Math.floor(row / blockSize) * blockSize;
+	const startCol = Math.floor(col / blockSize) * blockSize;
+	for (let i = 0; i < blockSize; i++) {
+		for (let j = 0; j < blockSize; j++) {
+			if (tab[startRow + i]![startCol + j] === num) return false;
+		}
+	}
+
+	return true;
+}
+
 for (let i = 0; i < 10; i++) generateGrid(new Grid(), Difficulty.Medium);
