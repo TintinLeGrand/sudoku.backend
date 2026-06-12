@@ -92,6 +92,7 @@ publish:
     - bun install --frozen-lockfile
     - bun run build
     - |
+      echo "@tintinlegrand:registry=https://${CI_SERVER_HOST}/api/v4/projects/${CI_PROJECT_ID}/packages/npm/" > .npmrc
       echo "//${CI_SERVER_HOST}/api/v4/projects/${CI_PROJECT_ID}/packages/npm/:_authToken=${CI_JOB_TOKEN}" >> .npmrc
     - bun publish --ignore-scripts
   rules:
