@@ -41,11 +41,20 @@ function randomCells(size: number): Cell[] {
 	return cells;
 }
 
-function generateGrid(grid: Grid, difficulty: Difficulty) {
-	var sudoku: Sudoku;
+function cloneGrid(source: Grid): Grid {
+	const clone = new Grid(source.size);
+	for (let y = 0; y < source.size; y++) {
+		for (let x = 0; x < source.size; x++) {
+			const val = source.getCell(x, y).number;
+			if (val !== null) clone.put(x, y, val, CellCategory.Normal);
+		}
+	}
+	return clone;
+}
 
-	const pos = Math.floor(Math.random() * (grid.size - 1 + 1));
-	const strategy = STRATEGIES[Math.floor(Math.random() * (2 + 1))];
+export function generateGrid(grid: Grid, difficulty: Difficulty): Sudoku {
+	const pos = Math.floor(Math.random() * grid.size);
+	const strategy = STRATEGIES[Math.floor(Math.random() * STRATEGIES.length)]!;
 	const shuffledCells: Cell[] = randomCells(grid.size);
 
 	switch (strategy) {
@@ -62,12 +71,42 @@ function generateGrid(grid: Grid, difficulty: Difficulty) {
 			console.error("Strategy choice does not exist");
 	}
 
-	grid.displayGrid();
+	backtrack(grid);
+
+	const solution = cloneGrid(grid);
+
+	const puzzle = cloneGrid(grid);
+	const totalCells = grid.size * grid.size;
+	const toRemove = Math.floor(totalCells * SUPPRESSION_RATIO[difficulty]);
+	const positions = Array.from({ length: totalCells }, (_, i) => i);
+
+	for (let i = positions.length - 1; i > 0; i--) {
+		const j = Math.floor(Math.random() * (i + 1));
+		[positions[i], positions[j]] = [positions[j]!, positions[i]!];
+	}
+
+	for (let i = 0; i < toRemove; i++) {
+		const idx = positions[i]!;
+		const x = idx % grid.size;
+		const y = Math.floor(idx / grid.size);
+		const val = puzzle.getCell(x, y).number!;
+		puzzle.erase(x, y, val, CellCategory.Normal);
+	}
+
+	return { difficulty, puzzle, solution };
 }
 
 function backtrack(grid: Grid): boolean {
 	const tab = grid.convertToTab();
-	return backtrackTab(tab);
+	const solved = backtrackTab(tab);
+	if (solved) {
+		for (let y = 0; y < grid.size; y++) {
+			for (let x = 0; x < grid.size; x++) {
+				grid.put(x, y, tab[y]![x]!, CellCategory.Normal);
+			}
+		}
+	}
+	return solved;
 }
 
 function backtrackTab(tab: number[][]): boolean {

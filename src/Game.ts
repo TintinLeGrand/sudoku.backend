@@ -1,15 +1,23 @@
+import { Difficulty, generateGrid, type Sudoku } from "../algorithm/grid";
 import { Grid } from "./Grid";
 
 export class Game {
 	time: number;
-	private _grid: Grid;
+	private _sudoku: Sudoku | null;
 	private _paused: boolean;
 
-	constructor(gridSize: number = 9) {
+	constructor() {
 		this.time = 0;
-		this._grid = new Grid(gridSize);
+		this._sudoku = null;
 		this._paused = true;
 	}
 
-	public start() {}
+	get grid(): Grid | null {
+		return this._sudoku?.puzzle ?? null;
+	}
+
+	public start(difficulty: Difficulty = Difficulty.Medium) {
+		this._sudoku = generateGrid(new Grid(), difficulty);
+		this._paused = false;
+	}
 }

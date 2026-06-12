@@ -142,5 +142,22 @@ export class Grid {
 		}
 
 		console.table(grid);
+
+		return grid;
+	}
+
+	public convertToTab(): number[][] {
+		const grid: number[][] = [];
+
+		for (let y = 0; y < this.size; y++) {
+			const row: number[] = [];
+			for (let x = 0; x < this.size; x++) {
+				const value = this.getCell(x, y).number ?? 0;
+				row.push(value);
+			}
+			grid.push(row);
+		}
+
+		return grid;
 	}
 }
