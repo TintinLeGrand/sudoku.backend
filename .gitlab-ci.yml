@@ -1,0 +1,98 @@
+stages:
+  - lint
+  - test
+  - build
+  - security
+  - publish
+
+default:
+  image: oven/bun:latest
+  before_script:
+    - bun install
+  cache:
+    key: "$CI_COMMIT_REF_SLUG"
+    paths:
+      - node_modules/
+      - ~/.bun/install/cache/
+
+# ── CI (lint + test + build + version check) ────────────────────────────────
+
+lint:
+  stage: lint
+  variables:
+    HUSKY: "0"
+  script:
+    - bunx @biomejs/biome ci .
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "dev"'
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+
+test:
+  stage: test
+  variables:
+    HUSKY: "0"
+  script:
+    - bun test
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "dev"'
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+
+build:
+  stage: build
+  variables:
+    HUSKY: "0"
+  script:
+    - bun run build
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "dev"'
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+
+version-check:
+  stage: build
+  variables:
+    HUSKY: "0"
+    GIT_FETCH_EXTRA_FLAGS: "--depth=0"
+  script:
+    - git fetch origin main
+    - VERSION_MAIN=$(git show origin/main:package.json | bun -e "const d=await Bun.stdin.text();process.stdout.write(JSON.parse(d).version)")
+    - VERSION_CURRENT=$(bun -e "import p from './package.json';process.stdout.write(p.version)")
+    - echo "Version sur main $VERSION_MAIN"
+    - echo "Version actuelle $VERSION_CURRENT"
+    - |
+      if [ "$VERSION_MAIN" = "$VERSION_CURRENT" ]; then
+        echo "Erreur : La version dans package.json doit être augmentée avant de merger sur main."
+        exit 1
+      else
+        echo "Version mise à jour avec succès."
+      fi
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "main"'
+
+# ── SAST (remplace CodeQL) ───────────────────────────────────────────────────
+
+semgrep:
+  stage: security
+  image: semgrep/semgrep:latest
+  before_script: []
+  cache: {}
+  script:
+    - semgrep ci --config=auto
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "main"'
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "main"'
+    - if: '$CI_PIPELINE_SOURCE == "schedule"'
+
+# ── Publish (GitLab Package Registry) ───────────────────────────────────────
+
+publish:
+  stage: publish
+  variables:
+    HUSKY: "0"
+  script:
+    - bun install --frozen-lockfile
+    - bun run build
+    - |
+      echo "//${CI_SERVER_HOST}/api/v4/projects/${CI_PROJECT_ID}/packages/npm/:_authToken=${CI_JOB_TOKEN}" >> .npmrc
+    - bun publish --ignore-scripts
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "main"'
